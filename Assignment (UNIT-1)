@@ -1,0 +1,45 @@
+//UNIT-1
+/*1 A company stores employee IDs in ascending order. Write a C program that accepts n employee
+IDs, searches for a required ID using Binary Search, displays its position when found, reports
+when it is absent, and counts the number of comparisons. Test the program for both successful
+and unsuccessful searches.*/
+
+
+#include <stdio.h>
+int search(int n,int ar[],int *comparisons,int key) {
+    int low=0,high=n-1;
+    while (low<=high) {
+        int mid=(low + high) / 2;
+        (*comparisons)++;
+        if(key==ar[mid]) {
+            return mid;
+        } else if(key<ar[mid]) {
+            high=mid-1;
+        } else{
+            low=mid+1;
+        }
+    }
+    return -1;
+}
+int main() {
+    int n;
+    printf("Enter number of employees: ");
+    scanf("%d", &n);
+    int ar[n]; //Array of employee id's
+    printf("Enter employee id's: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &ar[i]);
+    }
+    int key;//Employee id you want to search
+    printf("Enter the employee id which you want to search: ");
+    scanf("%d", &key);
+    int comparisons=0; //Number of comparisions initialized to 0
+    int result = search(n,ar,&comparisons,key);//Comparision is a pointer accessed using & operator
+    if (result!=-1) {
+        printf("Employee id %d found at position %d.\n", key, result + 1);
+    } else {
+        printf("Employee id %d not found in the records.\n", key);
+    }
+    printf("Number of comparisons made is: %d\n", comparisons);
+    return 0;
+}
