@@ -1,0 +1,78 @@
+/*4. A service centre uses a fixed-size request buffer in which released positions must be reused.
+Write a C program to implement a Circular Queue using an array with insertion, deletion, display,
+overflow and underflow operations. Demonstrate that positions freed after deletion can be reused
+for new requests.*/
+#include <stdio.h>
+#include <stdlib.h>
+#define size 10 //Fixed size buffer is 10
+int queue[size];
+int front=-1;
+int rear=-1;
+/* Inserting a new request into the circular queue */
+void enqueue(int value){
+    if((rear+1)%size==front){
+        printf("Queue overflow..\n");
+        printf("Cannot insert %d\n",value);
+    }
+    if(front==-1) {    /*inserting elements*/
+        front = 0;
+        rear = 0;
+    } else if (rear==size-1&&front!=0) {
+        rear = 0;
+    } else {
+        rear = rear + 1;
+    }
+    queue[rear] = value;
+    printf("Inserted element %d at position %d.\n", value, rear);
+}
+/* Removing and return the request at the front of the queue */
+void dequeue(){
+    if (front == -1) {
+        printf("Queue underflow...\n");
+        printf("Cannot delete elements.\n");
+    }
+    int removed = queue[front];
+    int freedPos = front;
+    if (front==rear) {         /* only one element was present */
+        front=-1;
+        rear=-1;
+    } else if (front==size-1) {
+        front = 0;           
+    } else {
+        front = front + 1;
+    }
+    printf("Removed request %d from position %d.\n",
+           removed, freedPos);
+}
+/*Displaying contents of queue*/
+void display() {
+    if (front==-1) {
+        printf("Queue is empty...\n");
+    }
+    printf("=====Circular Queue=====\n");
+    int i=front;
+    while(1){
+        printf("%d ", queue[i]);
+        if (i == rear){
+        break;
+        }
+        i= (i + 1)%size;
+    }
+    printf("\n");
+}
+int main()
+{
+    enqueue(1);
+    enqueue(2);
+    enqueue(3);
+    enqueue(4);
+    enqueue(5);
+    enqueue(6);
+    display();
+    enqueue(7);
+    printf("\n");
+    dequeue();
+    dequeue();
+    display();
+    printf("\n");
+}
