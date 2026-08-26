@@ -1,0 +1,60 @@
+/*3 An expression-processing application receives an arithmetic expression in infix form. Write a C
+program using a stack to convert it to postfix form while correctly handling parentheses and
+operator precedence for +, -, *, / and ^. Test the program using an expression containing multiple
+operators and parentheses.*/
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+#include <ctype.h>
+int prec(char c){
+    if(c=='^')
+     return 3;
+    else if(c=='/'||c=='*')
+     return 2;
+    else if(c=='+'||c=='-')
+      return 1;
+    else
+     return -1;   
+}
+void infixtopostfix(char *exp){
+    int len=strlen(exp);
+    char result[100];
+    char stack[100];
+    int j=0,top=-1;
+    for(int i=0;i<len;i++){
+        char c=exp[i];
+        if(c==' ')
+        {
+            continue;
+        }
+        if(isalnum(c))
+         result[j++]=c;
+        else if(c=='(')
+         stack[++top]='(';
+        else if(c==')'){
+            while(top!=-1&&stack[top]!='('){
+             result[j++]=stack[top--];
+            }
+             if(top!=-1)
+                top--;
+        }
+        else{
+            while(top!=-1 && stack[top]!='(' && (prec(c) < prec(stack[top]) || (prec(c) == prec(stack[top]) && c != '^')))
+             result[j++]=stack[top--];
+            stack[++top]=c; 
+        }
+    }
+    while(top!=-1){
+        result[j++]=stack[top--];
+    }
+     result[j]='\0';
+    printf("%s\n",result);
+}
+int main() {
+    char exp[100];
+    printf("Enter infix expression");
+    scanf("[^\n]",exp);
+    infixtopostfix(exp);
+    return 0;
+}
