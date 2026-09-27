@@ -1,0 +1,103 @@
+/*7. A system stores unique integer identification numbers using a Binary Search Tree. Write a C
+program to insert n values, display inorder, preorder and postorder traversals, search for a
+specified value, and report whether it exists. Use the output to explain why inorder traversal
+produces sorted values.*/
+
+/*QUESTION*/
+/*Why does inorder produce sorted values?
+In a Binary Search Tree:
+1. Left subtree contains smaller values.
+2. Right subtree contains greater values.
+3. Inorder visits Left → Root → Right.
+
+Therefore, the values are displayed in ascending order*/
+
+#include <stdio.h>
+#include <stdlib.h>
+/*Create a struct called as Node for BST*/
+struct Node{
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+struct Node *root=NULL;
+/*Creating a new node*/
+struct Node* create(int value) {
+    struct Node *newNode;
+    newNode=(struct Node*)malloc(sizeof(struct Node));
+    newNode->data=value;
+    newNode->left=NULL;
+    newNode->right=NULL;
+    return newNode;
+}
+/*Inserting into BST*/
+struct Node* insert(struct Node *root, int value) {
+    if (root == NULL)
+        return create(value);
+    if (value<root->data)
+        root->left = insert(root->left,value);
+    else if (value> root->data)
+        root->right = insert(root->right,value);
+    else
+        printf("Duplicate value is not allowed.\n");
+    return root;
+}
+/*Inorder (LPR) traversal,where L is left,P is parent and R is right.*/
+void inorder(struct Node *root) {
+    if (root!=NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+/*Preorder traversal (PLR)*/
+void preorder(struct Node *root) {
+    if (root!= NULL) {
+        printf("%d ", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+/*Postorder traversal(LRP)*/
+void postorder(struct Node *root) {
+    if (root!=NULL) {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->data);
+    }
+}
+/*Function to search for any value in the tree*/
+int search(struct Node *root, int value) {
+    if(root==NULL)
+        return 0;
+    if(root->data==value)
+        return 1;
+    if(value<root->data)
+        return search(root->left,value);
+    else
+        return search(root->right, value);
+}
+int main()
+{
+    int n, value, key, i;
+    printf("Enter number of values: ");
+    scanf("%d", &n);
+    printf("Enter values: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &value);
+        root = insert(root, value);
+    }
+    printf("\nInorder: ");
+    inorder(root);
+    printf("\nPreorder: ");
+    preorder(root);
+    printf("\nPostorder: ");
+    postorder(root);
+    printf("\n\nEnter value to search: ");
+    scanf("%d", &key);
+    if (search(root, key))
+        printf("%d exists in the BST\n", key);
+    else
+        printf("%d does not exist in the BST\n", key);
+    return 0; 
+}
