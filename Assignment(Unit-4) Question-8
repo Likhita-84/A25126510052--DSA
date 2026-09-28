@@ -1,0 +1,102 @@
+/*8. Extend a Binary Search Tree program to support deletion. The program should create a BST,
+delete a user-specified node, correctly handle nodes with zero, one and two children, and display
+inorder traversal before and after deletion. Test the program separately for all three deletion cases.*/
+
+#include <stdio.h>
+#include <stdlib.h>
+/*Create a struct called as Node for BST*/
+struct Node{
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+struct Node *root=NULL;
+/*Creating a new node*/
+struct Node* create(int value) {
+    struct Node *newNode;
+    newNode=(struct Node*)malloc(sizeof(struct Node));
+    newNode->data=value;
+    newNode->left=NULL;
+    newNode->right=NULL;
+    return newNode;
+}
+/*Inserting into BST*/
+struct Node* insert(struct Node *root, int value) {
+    if (root==NULL)
+        return create(value);
+    if (value<root->data)
+        root->left = insert(root->left,value);
+    else if (value> root->data)
+        root->right = insert(root->right,value);
+    else
+        printf("Duplicate value is not allowed.\n");
+    return root;
+}
+/*Inorder (LPR) traversal,where L is left,P is parent and R is right.*/
+void inorder(struct Node *root) {
+    if (root!=NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+/* Find minimum value node */
+struct Node* minValueNode(struct Node *root) {
+    struct Node *current = root;
+    while (current->left != NULL)
+        current = current->left;
+    return current;
+}
+/*Delete function have 3 cases*/
+struct Node *deleteNode(struct Node *root,int value){
+    /*Value not found.*/
+    if(root==NULL){
+        printf("Value not found.\n");
+        return root;
+    }
+   
+    if(value<root->data)
+        root->left=deleteNode(root->left,value);
+    else if(value>root->data)
+             root->right=deleteNode(root->right,value);
+    else   
+        //CASE-1(LEAF NODE)
+        if(root->left==NULL&&root->right==NULL){
+            free(root);
+            return NULL;
+        }  
+        //CASE-2(ONLY RIGHT CHILD)
+         else if (root->right == NULL) {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+          //CASE-3:(TWO CHILDREN)
+        else {
+            struct Node *temp = minValueNode(root->right);
+
+            root->data = temp->data;
+
+            root->right = deleteNode(root->right, temp->data);
+        }
+         return root;
+    }
+int main()
+{
+    int n, value, del;
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+    printf("Enter values: ");
+    for(int i = 0;i<n;i++){
+        scanf("%d", &value);
+        root=insert(root,value);
+    }
+    printf("Inorder traversal before deletion: ");
+    inorder(root);
+    printf("\nEnter value to delete: ");
+    scanf("%d", &del);
+    root = deleteNode(root, del);
+    printf("Inorder traversal after deletion: ");
+    inorder(root);
+    return 0;
+}
