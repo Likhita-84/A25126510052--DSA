@@ -1,0 +1,85 @@
+/*10. A transportation network contains cities connected by roads with different costs. Write a C
+program implementing Dijkstra’s Shortest Path Algorithm that accepts the number of vertices,
+weighted adjacency matrix and source vertex, computes the minimum distance from the source to
+every other vertex, and displays each destination with its shortest distance. Test it using at least
+five vertices.*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 50
+#define INF 1000000000
+int n;
+int w[MAX][MAX];       
+int dist[MAX];          /* Shortest known distance from source  */
+int parent[MAX];        /* Previous vertex on the shortest path */
+int done[MAX]; 
+int min_vertex() {
+    int best = -1, min = INF;
+    for (int i = 0; i < n; i++)
+        if (!done[i] && dist[i] < min) {
+            min = dist[i];
+            best = i;
+        }
+    return best;      
+}
+void dijkstra(int src) {
+    for (int i = 0; i < n; i++) {
+        dist[i] = INF;
+        parent[i] = -1;
+        done[i] = 0;
+    }
+    dist[src] = 0;
+    for (int k = 0; k < n; k++) {
+        int u = min_vertex();
+        if (u == -1) break;             
+        done[u] = 1;                    
+        for (int v = 0; v < n; v++) {
+            if (w[u][v] > 0 && !done[v] && dist[u] + w[u][v] < dist[v]) {
+                dist[v] = dist[u] + w[u][v];    /* relax edge u -> v */
+                parent[v] = u;
+            }
+        }
+    }
+}
+void print_path(int v) {
+    if (parent[v] != -1) {
+        print_path(parent[v]);
+        printf(" -> ");
+    }
+    printf("%d", v);
+}
+int main(){
+    int src;
+    printf("Enter number of vertices (1-%d): ", MAX);
+    if (scanf("%d", &n) != 1 || n < 1 || n > MAX) {
+        printf("Invalid number of vertices.\n");
+        return 1;
+    }
+        printf("Enter the %d x %d weighted adjacency matrix (0 = no road):\n", n, n);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            if (scanf("%d", &w[i][j]) != 1 || w[i][j] < 0) {
+                printf("Invalid matrix input (weights must be >= 0).\n");
+                return 1;
+            }
+        }
+    printf("Enter source vertex (0-%d): ", n - 1);
+    if (scanf("%d", &src) != 1 || src < 0 || src >= n) {
+        printf("Invalid source vertex.\n");
+        return 1;
+    }
+    dijkstra(src);
+    printf("\nShortest distances from source %d:\n", src);
+    printf("%-12s %-10s %s\n", "Destination", "Distance", "Path");
+    for (int v = 0; v < n; v++) {
+        printf("%-12d ", v);
+        if (dist[v] == INF) {
+            printf("%-10s %s\n", "INF", "unreachable");
+        } else {
+            printf("%-10d ", dist[v]);
+            print_path(v);
+            printf("\n");
+        }
+    }
+    return 0;
+}
