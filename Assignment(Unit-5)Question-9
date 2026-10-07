@@ -1,0 +1,90 @@
+/*9. A network of n locations is represented as a graph. Write a C program that accepts the graph
+using an Adjacency Matrix, accepts a starting vertex, performs a graph traversal, displays the visit
+order, and ensures that a vertex is not processed repeatedly. Test it with connected and partially
+connected graphs.*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 50
+int n;
+int adj[MAX][MAX];
+int visited[MAX];
+int order[MAX], count;
+/*BFS Function*/
+void bfs(int start) {
+    int queue[MAX], front = 0, rear = 0;
+    visited[start] = 1;              
+    queue[rear++] = start;
+    while (front < rear) {
+        int u = queue[front++];
+        order[count++] = u;
+        for (int v = 0; v < n; v++) {
+            if (adj[u][v] && !visited[v]) {
+                visited[v] = 1;
+                queue[rear++] = v;
+            }
+        }
+    }
+}
+/*DFS Function*/
+void dfs(int u) {
+    visited[u] = 1;
+    order[count++] = u;
+    for (int v = 0; v < n; v++)
+        if (adj[u][v] && !visited[v])
+            dfs(v);
+}
+void reset(void) {
+    for (int i = 0; i < n; i++) 
+        visited[i] = 0;
+    count = 0;
+}
+void report(const char *name) {
+    printf("%s visit order: ", name);
+    for (int i = 0; i < count; i++)
+        printf("%d%s", order[i], i < count - 1 ? " -> " : "\n");
+    if (count == n) 
+        printf("Graph is CONNECTED from this start vertex (all %d vertices visited).\n", n);
+     else {
+        printf("Graph is PARTIALLY connected: %d of %d vertices reached.\n", count, n);
+        printf("Unreachable vertices: ");
+        for (int i = 0; i < n; i++)
+            if (!visited[i]) printf("%d ", i);
+        printf("\n");
+    }
+}
+int main()
+{
+    int start;
+    printf("Enter number of locations (vertices, 1-%d): ", MAX);
+    if (scanf("%d", &n) != 1 || n < 1 || n > MAX) {
+        printf("Invalid number of vertices.\n");
+        return 1;
+    }
+    printf("Enter the %d x %d adjacency matrix (0/1):\n", n, n);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            if (scanf("%d", &adj[i][j]) != 1) {
+                printf("Invalid matrix input.\n");
+                return 1;
+            }
+            adj[i][j] = adj[i][j] ? 1 : 0;
+        }
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            if (adj[i][j]) adj[j][i] = 1;
+    printf("Enter starting vertex (0-%d): ", n - 1);
+    if (scanf("%d", &start)!= 1 || start < 0 || start >= n) {
+        printf("Invalid starting vertex.\n");
+        return 1;
+    }
+    printf("\n--- BFS ---\n");
+    reset();
+    bfs(start);
+    report("BFS");
+    printf("\n--- DFS ---\n");
+    reset();
+    dfs(start);
+    report("DFS");
+    return 0;
+}
